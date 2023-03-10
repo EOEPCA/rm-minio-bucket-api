@@ -4,7 +4,7 @@ import json
 from secrets import token_urlsafe
 from http import HTTPStatus
 
-from minio import Minio
+
 
 from pydantic import BaseModel
 
@@ -34,17 +34,15 @@ class BucketCredentials(BaseModel):
     secretNamespace: str
 
 
-@app.post("/bucket", status_code=HTTPStatus.CREATED)
+@app.post("/bucket", status_code=HTTPStatus.OK)
 async def create_minio_bucket(data: BucketCredentials) -> None:
     logger.info(f"Creating bucket in namespace {data.bucketName}")
 
-    client = Minio(
-        endpoint=config.MINIO_SERVER_ENDPOINT,
-        access_key=config.MINIO_ROOT_USER,
-        secret_key=config.MINIO_ROOT_PASSWORD
-    )
-    # creating the bucket
-    client.make_bucket(data.bucketName)
+    subprocess.run([
+        "./mc", "mb",
+        f"minioServer/{data.bucketName}",
+
+    ])
 
     # creating new user and generating credentials
     user = "user-" + token_urlsafe(10)
@@ -77,7 +75,7 @@ async def create_minio_bucket(data: BucketCredentials) -> None:
         ]
     }
 
-    with open("/tmp/{data.bucketName}-policy.json", "w") as outfile:
+    with open(f"/tmp/{data.bucketName}-policy.json", "w") as outfile:
         json.dump(standard_policy, outfile)
 
     subprocess.run([
@@ -91,7 +89,7 @@ async def create_minio_bucket(data: BucketCredentials) -> None:
         "./mc", "admin",
         "policy", "set", "minioServer",
         f"{data.bucketName}-policy",
-        user
+        f"user={user}"
     ])
 
     credentials = {

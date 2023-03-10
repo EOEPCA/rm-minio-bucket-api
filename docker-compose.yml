@@ -1,0 +1,16 @@
+version: "3.7"
+services:
+    minio-bucket:
+        build: .
+        ports:
+        - 5000:5000
+        volumes:
+        - .:/srv/service
+        env_file: test_environment.env
+        command: uvicorn --reload --host=0.0.0.0 --port 5000 --log-level=info --reload minio_bucket:app
+    minio-server:
+        image: minio/minio
+        ports:
+        - 9000:9000
+        env_file: test_environment.env
+        command: server /data --console-address ":9001"

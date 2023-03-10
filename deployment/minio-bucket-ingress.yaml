@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minio-bucket
+  namespace: dev
+  labels:
+    app.kubernetes.io/instance: minio-bucket
+    app.kubernetes.io/name: minio-bucket
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/tls-acme: 'true'
+    nginx.ingress.kubernetes.io/proxy-read-timeout: '600'
+spec:
+  rules:
+    - host: minio-bucket.dev.hub.eox.at
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: minio-bucket
+                port:
+                  name: http

@@ -1,0 +1,68 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio-bucket
+  namespace: dev
+  labels:
+    app.kubernetes.io/instance: minio-bucket
+    app.kubernetes.io/name: minio-bucket
+spec:
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+    type: RollingUpdate
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: minio-bucket
+      app.kubernetes.io/name: minio-bucket
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+      labels:
+        app.kubernetes.io/instance: minio-bucket
+        app.kubernetes.io/name: minio-bucket
+    spec:
+      serviceAccountName: minio-bucket
+      containers:
+      - name: minio-bucket
+        #image: 'registry.gitlab.eox.at/eox/hub/minio-bucket:0.8.5'
+        image: minio-bucket-k8s:0
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /probe
+            port: 8080
+          initialDelaySeconds: 5
+          timeoutSeconds: 2
+          periodSeconds: 3
+          failureThreshold: 1
+        livenessProbe:
+          httpGet:
+            path: /probe
+            port: 8080
+          initialDelaySeconds: 10
+          timeoutSeconds: 2
+          periodSeconds: 8
+          failureThreshold: 1
+        env:
+        - name: NAMESPACE_FOR_BUCKET_RESOURCE
+          value: "dev"
+        resources:
+          limits:
+            cpu: 0.5
+            memory: 512Mi
+          requests:
+            cpu: 0.05
+            memory: 128Mi
+        imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler

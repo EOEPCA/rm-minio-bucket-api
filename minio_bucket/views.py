@@ -3,8 +3,7 @@ import subprocess
 import json
 from secrets import token_urlsafe
 from http import HTTPStatus
-
-
+import tempfile
 
 from pydantic import BaseModel
 
@@ -14,14 +13,17 @@ from minio_bucket import app, config
 # TODO: fix logging output with gunicorn
 logger = logging.getLogger(__name__)
 
-CONTAINER_REGISTRY_SECRET_NAME = "container-registry"
+ALIAS = "minioServer"
 
 
 @app.on_event("startup")
 async def setup_minio_alias():
+    # create a new alias for future use
     subprocess.run([
-        "./mc", "alias",
-        "set", "minioServer",
+        "./mc",
+        "alias",
+        "set",
+        ALIAS,
         config.MINIO_SERVER_ENDPOINT,
         config.MINIO_ROOT_USER,
         config.MINIO_ROOT_PASSWORD
@@ -38,18 +40,25 @@ class BucketCredentials(BaseModel):
 async def create_minio_bucket(data: BucketCredentials) -> None:
     logger.info(f"Creating bucket in namespace {data.bucketName}")
 
+    # create the bucket
     subprocess.run([
-        "./mc", "mb",
-        f"minioServer/{data.bucketName}",
-
+        "./mc",
+        "mb",
+        f"{ALIAS}/{data.bucketName}",
     ])
 
     # creating new user and generating credentials
     user = "user-" + token_urlsafe(10)
     password = token_urlsafe(16)
+
+    # create a new user with the provided credentials
+    logger.info(f"Creating user {user}")
     subprocess.run([
-        "./mc", "admin",
-        "user", "add", "minioServer",
+        "./mc",
+        "admin",
+        "user",
+        "add",
+        ALIAS,
         user,
         password
     ])
@@ -75,19 +84,32 @@ async def create_minio_bucket(data: BucketCredentials) -> None:
         ]
     }
 
-    with open(f"/tmp/{data.bucketName}-policy.json", "w") as outfile:
+    with tempfile.NamedTemporaryFile(suffix=".json") as outfile:
         json.dump(standard_policy, outfile)
+        outfile.seek(0)
 
-    subprocess.run([
-        "./mc", "admin",
-        "policy", "add", "minioServer",
-        f"{data.bucketName}-policy",
-        f"/tmp/{data.bucketName}-policy.json"
-    ])
+        logger.info(
+            f"Creating policy {data.bucketName}-policy at {outfile.name}"
+        )
+        # create a new policy
+        subprocess.run([
+            "./mc",
+            "admin",
+            "policy",
+            "add",
+            ALIAS,
+            f"{data.bucketName}-policy",
+            outfile.name
+        ])
 
+    # set the policy for the user
+    logger.info(f"Setting policy {data.bucketName}-policy for user {user}")
     subprocess.run([
-        "./mc", "admin",
-        "policy", "set", "minioServer",
+        "./mc",
+        "admin",
+        "policy",
+        "set",
+        ALIAS,
         f"{data.bucketName}-policy",
         f"user={user}"
     ])

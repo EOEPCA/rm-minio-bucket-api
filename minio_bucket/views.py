@@ -116,8 +116,8 @@ async def create_minio_bucket(data: BucketCredentials) -> None:
 
     credentials = {
         "bucketname": data.bucketName,
-        "access": user,
-        "secret": password,
+        "access_key": user,
+        "access_secret": password,
         "projectid": ""
     }
     return credentials

@@ -84,7 +84,7 @@ async def create_minio_bucket(data: BucketCredentials) -> None:
         ]
     }
 
-    with tempfile.NamedTemporaryFile(suffix=".json") as outfile:
+    with tempfile.NamedTemporaryFile(mode="wt", suffix=".json") as outfile:
         json.dump(standard_policy, outfile)
         outfile.seek(0)
 

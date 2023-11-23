@@ -80,7 +80,7 @@ The Minio Bucket API is deployed via the rm-minio-bucket-api helm chart from the
 
 ## Documentation
 
-The component documentation can be found at https://deployment-guide.docs.eoepca.org/v1.3/eoepca/workspace/#bucket-creation-webhook
+The component documentation can be found at https://deployment-guide.docs.eoepca.org/current/eoepca/workspace/#bucket-creation-webhook
 
 <!-- USAGE EXAMPLES -->
 

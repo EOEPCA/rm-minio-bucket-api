@@ -1,9 +1,3 @@
-<!--
-***
-*** To avoid retyping too much info. Do a search and replace for the following:
-*** template-svce, twitter_handle, email
--->
-
 <!-- PROJECT SHIELDS -->
 <!--
 *** See the bottom of this document for the declaration of the reference variables
@@ -21,22 +15,22 @@
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
-  <a href="https://github.com/EOEPCA/template-svce">
+  <a href="https://github.com/EOEPCA/rm-minio-bucket-api">
     <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
-  <h3 align="center">template-service</h3>
+  <h3 align="center">EOEPCA Minio Bucket API</h3>
 
   <p align="center">
-    Template for developing an EOEPCA Service
+    This repository includes the EOEPCA Minio Bucket API component
     <br />
-    <a href="https://github.com/EOEPCA/template-svce"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/EOEPCA/rm-minio-bucket-api"><strong>Explore the docs »</strong></a>
     <br />
-    <a href="https://github.com/EOEPCA/template-svce">View Demo</a>
+    <a href="https://github.com/EOEPCA/rm-minio-bucket-api">View Demo</a>
     ·
-    <a href="https://github.com/EOEPCA/template-svce/issues">Report Bug</a>
+    <a href="https://github.com/EOEPCA/rm-minio-bucket-api/issues">Report Bug</a>
     ·
-    <a href="https://github.com/EOEPCA/template-svce/issues">Request Feature</a>
+    <a href="https://github.com/EOEPCA/rm-minio-bucket-api/issues">Request Feature</a>
   </p>
 </p>
 
@@ -47,11 +41,8 @@
 - [About the Project](#about-the-project)
   - [Built With](#built-with)
 - [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
   - [Installation](#installation)
-  - [Testing](#testing)
 - [Documentation](#documentation)
-- [Usage](#usage)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
 - [License](#license)
@@ -62,90 +53,43 @@
 
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+During workspace creation the `workspace-api` needs to create an object storage bucket for the user. The method by which the bucket is created is a function of the hosting infrastructure object storage layer - i.e. there is no ‘common’ approach for the `workspace-api` to perform the bucket creation.
 
-Here's a blank template to get started:
-**To avoid retyping too much info. Do a search and replace with your text editor for the following:**
-`template-svce`, `twitter_handle`, `email`
+In order to allow this bucket creation step to be customised by the platform integrator, the `workspace-api` is configured with a webhook endpoint that is invoked to effect the bucket creation on behalf of the `workspace-api`.
+
+The Minio Bucket API provides an implementation of a Bucket Creation Webhook for a Minio S3 Object Storage backend. This is used as the default but should be replaced for a production deployment with an appropriate webhook to integrate with the object storage solution of the deployment environment.
+
 
 ### Built With
 
-- [Javalin framework](https://javalin.io/)
-- [Log4j2](https://logging.apache.org/log4j/2.x/) + [YAML](https://yaml.org/)
-- [Junit 5](https://junit.org/junit5/)
+- FastAPI
+- Kubernetes Python API
 
 <!-- GETTING STARTED -->
 
 ## Getting Started
 
-To get a local copy up and running follow these simple steps.
-
-### Prerequisites
-
-This is an example of how to list things you need to use the software and how to install them.
-
-- [Vagrant](https://www.vagrantup.com/docs/installation/)
-- [EOEPCA Development Environment](https://github.com/EOEPCA/dev-env)
-
 ### Installation
 
-1. Get into EOEPCA's development environment
+The Minio Bucket API is deployed via the rm-minio-bucket-api helm chart from the EOEPCA [Helm Chart Repository](https://eoepca.github.io/helm-charts) - ref. [ Helm Chart for the Minio Bucket API](https://github.com/EOEPCA/helm-charts/blob/main/charts/rm-minio-bucket-api).
 
-```sh
-vagrant ssh
-```
+  helm install --version 0.0.4 --values minio-bucket-api-values.yaml \
+    --repo https://eoepca.github.io/helm-charts \
+    rm-minio-bucket-api rm-minio-bucket-api
 
-3. Clone the repo
-
-```sh
-git clone https://github.com/EOEPCA/template-svce.git
-```
-
-4. Change local directory
-
-```sh
-cd template-service
-```
-
-### Testing
-
-- `./gradlew build` runs only the unit tests
-- `./gradlew integrationTest` runs only the integration tests (it compiles all source code beforehand). It does not package or deploy a build.
-  This is assumed to have been done in a prior build pipeline step.
 
 ## Documentation
 
-The component documentation can be found at https://eoepca.github.io/template-svce/.
+The component documentation can be found at https://deployment-guide.docs.eoepca.org/v1.3/eoepca/workspace/#bucket-creation-webhook
 
 <!-- USAGE EXAMPLES -->
 
-## Usage
-
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
-
-_For more examples, please refer to the [Documentation](https://example.com)_
-
-### Running the template service
-
-Just execute the run task in Gradle
-
-```sh
-./gradlew run
-```
-
-### Upgrading Gradle Wrapper
-
-Change the version number in the `build.gradle` wrapper task then run:
-
-```sh
-./gradlew wrapper --gradle-version=4.10.2 --distribution-type=bin
-```
 
 <!-- ROADMAP -->
 
 ## Roadmap
 
-See the [open issues](https://github.com/EOEPCA/template-svce/issues) for a list of proposed features (and known issues).
+See the [open issues](https://github.com/EOEPCA/rm-minio-bucket-api/issues) for a list of proposed features (and known issues).
 
 <!-- CONTRIBUTING -->
 
@@ -169,30 +113,26 @@ Distributed under the Apache-2.0 License. See `LICENSE` for more information.
 
 ## Contact
 
-Your Name - [@twitter_handle](https://twitter.com/twitter_handle) - email
-
-Project Link: [https://github.com/EOEPCA/template-svce](https://github.com/EOEPCA/template-svce)
+Project Link: [https://github.com/EOEPCA/rm-minio-bucket-api](https://github.com/EOEPCA/template-svce)
 
 <!-- ACKNOWLEDGEMENTS -->
 
 ## Acknowledgements
 
-- []()
-- []()
 - README.md is based on [this template](https://github.com/othneildrew/Best-README-Template) by [Othneil Drew](https://github.com/othneildrew).
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 
-[contributors-shield]: https://img.shields.io/github/contributors/EOEPCA/template-svce.svg?style=flat-square
-[contributors-url]: https://github.com/EOEPCA/template-svce/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/EOEPCA/template-svce.svg?style=flat-square
-[forks-url]: https://github.com/EOEPCA/template-svce/network/members
-[stars-shield]: https://img.shields.io/github/stars/EOEPCA/template-svce.svg?style=flat-square
-[stars-url]: https://github.com/EOEPCA/template-svce/stargazers
-[issues-shield]: https://img.shields.io/github/issues/EOEPCA/template-svce.svg?style=flat-square
-[issues-url]: https://github.com/EOEPCA/template-svce/issues
-[license-shield]: https://img.shields.io/github/license/EOEPCA/template-svce.svg?style=flat-square
-[license-url]: https://github.com/EOEPCA/template-svce/blob/master/LICENSE
-[build-shield]: https://www.travis-ci.com/EOEPCA/template-svce.svg?branch=master
-[product-screenshot]: images/screenshot.png
+[contributors-shield]: https://img.shields.io/github/contributors/EOEPCA/rm-minio-bucket-api.svg?style=flat-square
+[contributors-url]: https://github.com/EOEPCA/rm-minio-bucket-api/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/EOEPCA/rm-minio-bucket-api.svg?style=flat-square
+[forks-url]: https://github.com/EOEPCA/rm-minio-bucket-api/network/members
+[stars-shield]: https://img.shields.io/github/stars/EOEPCA/rm-minio-bucket-api.svg?style=flat-square
+[stars-url]: https://github.com/EOEPCA/rm-minio-bucket-api/stargazers
+[issues-shield]: https://img.shields.io/github/issues/EOEPCA/rm-minio-bucket-api.svg?style=flat-square
+[issues-url]: https://github.com/EOEPCA/rm-minio-bucket-api/issues
+[license-shield]: https://img.shields.io/github/license/EOEPCA/rm-minio-bucket-api.svg?style=flat-square
+[license-url]: https://github.com/EOEPCA/rm-minio-bucket-api/blob/master/LICENSE
+[build-shield]: https://www.travis-ci.com/EOEPCA/rm-minio-bucket-api.svg?branch=master
+
